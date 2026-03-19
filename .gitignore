@@ -1,0 +1,17 @@
+# --- Data (never commit raw CSVs or processed files) ---
+data/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# --- macOS ---
+.DS_Store
