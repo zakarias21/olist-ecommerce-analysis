@@ -280,3 +280,92 @@ def build_delivery_metrics(orders: pd.DataFrame) -> pd.DataFrame:
     print(f"   Late delivery rate : {late_pct:.2f}%")
 
     return df
+
+def aggregate_geolocation(
+    geo: pd.DataFrame,
+    cache_path: str | None = None
+) -> pd.DataFrame:
+    """
+    Deduplicates and aggregates raw geolocation to zip-prefix level.
+
+    Steps:
+        1. Check for a parquet cache — if it exists, load and return it instantly
+        2. Normalize city (lowercase) and state (uppercase) strings
+        3. Drop exact duplicate rows from the raw 1M+ row table
+        4. Group by zip prefix → mean lat, mean lng, first city, first state
+        5. Save the result to parquet cache for all future runs
+
+    Args:
+        geo        : Raw geolocation DataFrame (1M+ rows) from load_and_clean_all().
+        cache_path : Optional path to read/write a parquet cache.
+                     Recommended: 'data/processed/geo_agg.parquet'
+                     - If file exists  → skips all processing, loads in ~0.1s
+                     - If file missing → builds from raw, saves for next time
+
+    Returns:
+        Aggregated DataFrame (~19k rows) with one row per zip_code_prefix.
+    """
+
+    import os
+
+    # ── 1. CACHE CHECK ────────────────────────────────────────────────────────
+    # If a cache file exists, skip the entire 1M-row pipeline
+    # This turns a ~30s operation into a ~0.1s load on every run after the first
+    if cache_path and os.path.exists(cache_path):
+        print(f"⚡ Loading geo_agg from cache: {cache_path}")
+        geo_agg = pd.read_parquet(cache_path)
+        print(f"   Loaded {len(geo_agg):,} zip prefixes from cache.")
+        return geo_agg
+
+    print("🔄 Building geo_agg from raw data (1M+ rows) — this runs once...")
+
+    # ── 2. NORMALIZE ──────────────────────────────────────────────────────────
+    # Lowercase city: prevents 'Sao Paulo' vs 'sao paulo' grouping as two cities
+    # Uppercase state: standard BR state code format (SP, RJ, MG...)
+    geo = geo.copy()
+    geo['geolocation_city'] = (
+        geo['geolocation_city']
+        .str.strip()
+        .str.lower()
+    )
+    geo['geolocation_state'] = (
+        geo['geolocation_state']
+        .str.strip()
+        .str.upper()
+    )
+
+    # ── 3. DEDUPLICATE ────────────────────────────────────────────────────────
+    # The raw table has thousands of identical rows — confirmed in notebook.
+    # Dropping them before groupby significantly reduces memory overhead.
+    before = len(geo)
+    geo = geo.drop_duplicates()
+    after  = len(geo)
+    print(f"   Duplicates removed : {before - after:,} rows")
+    print(f"   Rows remaining     : {after:,}")
+
+    # ── 4. AGGREGATE BY ZIP PREFIX ────────────────────────────────────────────
+    # Coordinates vary slightly within the same prefix (different streets).
+    # Mean lat/lng gives a stable centroid for the prefix — good enough for
+    # regional analysis and merging with customers/sellers tables.
+    geo_agg = (
+        geo
+        .groupby('geolocation_zip_code_prefix', as_index=False)
+        .agg({
+            'geolocation_lat':  'mean',
+            'geolocation_lng':  'mean',
+            'geolocation_city': 'first',
+            'geolocation_state':'first'
+        })
+    )
+
+    print(f"   Unique zip prefixes : {len(geo_agg):,}")
+
+    # ── 5. SAVE TO PARQUET CACHE ──────────────────────────────────────────────
+    # All future runs skip straight to step 1 — zero reprocessing
+    if cache_path:
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        geo_agg.to_parquet(cache_path, index=False)
+        print(f"   ✅ Cache saved to: {cache_path}")
+
+    print("✅ geo_agg built successfully.")
+    return geo_agg
