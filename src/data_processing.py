@@ -208,3 +208,75 @@ def aggregate_geolocation(
         Aggregated DataFrame with one row per zip_code_prefix.
     """
     pass
+
+def build_delivery_metrics(orders: pd.DataFrame) -> pd.DataFrame:
+    """
+    Adds five delivery columns to the orders DataFrame:
+        - delivery_days          : actual days from purchase to delivery
+        - estimated_delivery_days: estimated days from purchase to delivery
+        - delay_days             : actual minus estimated (negative = early)
+        - delivery_status        : 'Early', 'On-Time', or 'Late'
+        - purchase_month         : period column (YYYY-MM) for monthly trend analysis
+
+    Only operates on delivered orders — non-delivered rows get NaN in all columns.
+
+    Args:
+        orders: Cleaned orders DataFrame with datetime columns already parsed
+                by load_and_clean_all().
+
+    Returns:
+        The same DataFrame with five new columns added.
+    """
+
+    # ── 1. WORK ON A COPY ─────────────────────────────────────────────────────
+    # We never mutate the input — caller keeps their original df intact
+    df = orders.copy()
+
+    # ── 2. DELIVERY DURATION METRICS ──────────────────────────────────────────
+    # Actual delivery time: purchase → delivered to customer
+    df['delivery_days'] = (
+        df['order_delivered_customer_date'] -
+        df['order_purchase_timestamp']
+    ).dt.days
+
+    # Estimated delivery time: purchase → what was promised
+    df['estimated_delivery_days'] = (
+        df['order_estimated_delivery_date'] -
+        df['order_purchase_timestamp']
+    ).dt.days
+
+    # Delay: positive = late, negative = early, zero = exactly on time
+    # This is the single most important operational KPI in the dataset
+    df['delay_days'] = (
+        df['order_delivered_customer_date'] -
+        df['order_estimated_delivery_date']
+    ).dt.days
+
+    # ── 3. DELIVERY STATUS LABEL ──────────────────────────────────────────────
+    # Only classify rows that have a computed delay_days value
+    # (i.e. delivered orders) — undelivered rows stay NaN
+    df['delivery_status'] = df['delay_days'].apply(
+        lambda x: 'Late'    if x > 0  else
+                  'On-Time' if x == 0 else
+                  'Early'   if x < 0  else
+                  None  # NaN delay_days → undelivered
+    )
+
+    # ── 4. PURCHASE MONTH ─────────────────────────────────────────────────────
+    # Period column for monthly late delivery rate trend (Section VI in notebook)
+    df['purchase_month'] = (
+        pd.to_datetime(df['order_purchase_timestamp'])
+        .dt.to_period('M')
+    )
+
+    # ── 5. SUMMARY PRINT ──────────────────────────────────────────────────────
+    delivered = df[df['order_status'] == 'delivered']
+    late_pct   = (delivered['delay_days'] > 0).mean() * 100
+    avg_days   = delivered['delivery_days'].mean()
+
+    print("✅ Delivery metrics built successfully.")
+    print(f"   Delivered orders   : {len(delivered):,}")
+    print(f"   Avg delivery time  : {avg_days:.2f} days")
+    print(f"   Late delivery rate : {late_pct:.2f}%")
+
+    return df
