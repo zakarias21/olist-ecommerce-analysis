@@ -23,7 +23,158 @@ def load_and_clean_all(base_path: str) -> dict[str, pd.DataFrame]:
             'sellers',   'geolocation', 'category_translation'
         }
     """
-    pass
+
+    # ── 1. LOAD ───────────────────────────────────────────────────────────────
+    customers            = pd.read_csv(base_path + "olist_customers_dataset.csv")
+    orders               = pd.read_csv(base_path + "olist_orders_dataset.csv")
+    order_items          = pd.read_csv(base_path + "olist_order_items_dataset.csv")
+    payments             = pd.read_csv(base_path + "olist_order_payments_dataset.csv")
+    reviews              = pd.read_csv(base_path + "olist_order_reviews_dataset.csv")
+    products             = pd.read_csv(base_path + "olist_products_dataset.csv")
+    sellers              = pd.read_csv(base_path + "olist_sellers_dataset.csv")
+    geolocation          = pd.read_csv(base_path + "olist_geolocation_dataset.csv")
+    category_translation = pd.read_csv(base_path + "product_category_name_translation.csv")
+
+    # ── 2. CUSTOMERS ──────────────────────────────────────────────────────────
+    # Notebook confirmed: no nulls, no duplicates.
+    # Defensive guard added for future batch data.
+    customers = customers.drop_duplicates()
+    # Zip prefix is categorical — no math will ever be done on it
+    customers['customer_zip_code_prefix'] = (
+        customers['customer_zip_code_prefix'].astype('object')
+    )
+
+    # ── 3. ORDERS ─────────────────────────────────────────────────────────────
+    # Notebook confirmed: no duplicates.
+    # Missing delivery dates are INTENTIONAL — they are undelivered orders.
+    # NaT rows are excluded naturally when computing delivery metrics downstream.
+    # We do NOT impute them.
+    orders = orders.drop_duplicates()
+    date_cols = [
+        'order_purchase_timestamp',
+        'order_delivered_customer_date',
+        'order_delivered_carrier_date',
+        'order_approved_at',
+        'order_estimated_delivery_date'
+    ]
+    orders[date_cols] = orders[date_cols].apply(
+        lambda col: pd.to_datetime(col, errors='coerce')
+    )
+
+    # ── 4. ORDER ITEMS ────────────────────────────────────────────────────────
+    # Notebook confirmed: no nulls, no duplicates.
+    # Defensive guard added for future batch data.
+    order_items = order_items.drop_duplicates()
+    order_items['shipping_limit_date'] = pd.to_datetime(
+        order_items['shipping_limit_date'], errors='coerce'
+    )
+    # Item ID is a label, not a quantity — treat as categorical
+    order_items['order_item_id'] = order_items['order_item_id'].astype('object')
+
+    # ── 5. PAYMENTS ───────────────────────────────────────────────────────────
+    # Notebook confirmed: no nulls, no duplicates.
+    # Defensive guard added for future batch data.
+    payments = payments.drop_duplicates()
+
+    # ── 6. REVIEWS ────────────────────────────────────────────────────────────
+    # Notebook confirmed: no duplicates.
+    # Comment columns have too many nulls and are not used in analysis — dropped.
+    # review_score nulls: none found, but defensively drop any that appear
+    # since a null score cannot be analyzed.
+    reviews = reviews.drop_duplicates()
+    reviews.drop(
+        columns=['review_comment_title', 'review_comment_message'],
+        inplace=True
+    )
+    reviews = reviews.dropna(subset=['review_score'])
+    reviews[['review_creation_date', 'review_answer_timestamp']] = (
+        reviews[['review_creation_date', 'review_answer_timestamp']]
+        .apply(pd.to_datetime, errors='coerce')
+    )
+
+    # ── 7. PRODUCTS ───────────────────────────────────────────────────────────
+    # Fix typos in original column names
+    products = products.drop_duplicates()
+    products = products.rename(columns={
+        'product_name_lenght':        'product_name_length',
+        'product_description_lenght': 'product_description_length'
+    })
+    # Preserve revenue rows — 'unknown' category beats a dropped row
+    products['product_category_name'] = (
+        products['product_category_name'].fillna('unknown')
+    )
+    # Counts cannot be decimals — fill nulls with 0 before casting
+    count_cols = [
+        'product_name_length',
+        'product_description_length',
+        'product_photos_qty'
+    ]
+    products[count_cols] = products[count_cols].fillna(0).astype(int)
+
+    # Only 2 rows affected — dropping avoids unrealistic imputation
+    # Cannot estimate weight/dimensions from other columns
+    products = products.dropna(subset=[
+        'product_weight_g',
+        'product_length_cm',
+        'product_height_cm',
+        'product_width_cm'
+    ])
+    # Standardize for clean merges with category_translation
+    products['product_category_name'] = (
+        products['product_category_name'].str.strip().str.lower()
+    )
+    # Feature engineering: volume for freight/logistics analysis
+    products['product_volume_cm3'] = (
+        products['product_length_cm'] *
+        products['product_height_cm'] *
+        products['product_width_cm']
+    )
+
+    # ── 8. SELLERS ────────────────────────────────────────────────────────────
+    # Notebook confirmed: no nulls, seller_id is unique.
+    # Defensive guard added for future batch data.
+    sellers = sellers.drop_duplicates()
+    sellers['seller_city'] = sellers['seller_city'].str.strip().str.lower()
+
+    # ── 9. GEOLOCATION ────────────────────────────────────────────────────────
+    # NOTE: geolocation has known duplicate rows (confirmed in notebook).
+    # Deduplication happens inside aggregate_geolocation() — not here —
+    # because the raw table is only ever used through that function.
+    # No nulls found in notebook.
+
+    # ── 10. CATEGORY TRANSLATION ──────────────────────────────────────────────
+    # Notebook confirmed: no nulls, no duplicates after standardizing.
+    category_translation = category_translation.drop_duplicates()
+    category_translation['product_category_name'] = (
+        category_translation['product_category_name'].str.strip().str.lower()
+    )
+    category_translation['product_category_name_english'] = (
+        category_translation['product_category_name_english'].str.strip()
+    )
+
+    # ── 11. RETURN ALL TABLES ─────────────────────────────────────────────────
+    print("✅ All tables loaded and cleaned successfully.")
+    print(f"   customers:            {customers.shape}")
+    print(f"   orders:               {orders.shape}")
+    print(f"   order_items:          {order_items.shape}")
+    print(f"   payments:             {payments.shape}")
+    print(f"   reviews:              {reviews.shape}")
+    print(f"   products:             {products.shape}")
+    print(f"   sellers:              {sellers.shape}")
+    print(f"   geolocation:          {geolocation.shape}")
+    print(f"   category_translation: {category_translation.shape}")
+
+    return {
+        'customers':            customers,
+        'orders':               orders,
+        'order_items':          order_items,
+        'payments':             payments,
+        'reviews':              reviews,
+        'products':             products,
+        'sellers':              sellers,
+        'geolocation':          geolocation,
+        'category_translation': category_translation,
+    }
 
 
 def build_delivery_metrics(orders: pd.DataFrame) -> pd.DataFrame:
@@ -49,16 +200,9 @@ def aggregate_geolocation(
     """
     Deduplicates and aggregates raw geolocation to zip-prefix level.
 
-    Steps:
-        1. Normalize city/state strings (strip, lowercase)
-        2. Drop exact duplicate rows
-        3. Group by zip prefix → mean lat, mean lon
-
     Args:
         geo        : Raw geolocation DataFrame (1M+ rows).
-        cache_path : Optional path to read/write a parquet cache
-                     e.g. 'data/processed/geo_agg.parquet'
-                     If file exists → loads it. If not → builds and saves it.
+        cache_path : Optional path to read/write a parquet cache.
 
     Returns:
         Aggregated DataFrame with one row per zip_code_prefix.
