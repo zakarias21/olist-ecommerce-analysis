@@ -14,4 +14,5 @@ venv/
 *.ipynb_checkpoints
 
 # --- macOS ---
-.DS_Store
+.DS_Storereports/
+Notebooks/THE_BRAZILIAN_E-COMMERCE_PRO_AUDITED.ipynb
