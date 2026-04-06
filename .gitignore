@@ -1,6 +1,3 @@
-# --- Data (never commit raw CSVs or processed files) ---
-data/
-
 # --- Python ---
 __pycache__/
 *.py[cod]
@@ -12,7 +9,3 @@ venv/
 # --- Jupyter ---
 .ipynb_checkpoints/
 *.ipynb_checkpoints
-
-# --- macOS ---
-.DS_Storereports/
-Notebooks/THE_BRAZILIAN_E-COMMERCE_PRO_AUDITED.ipynb
