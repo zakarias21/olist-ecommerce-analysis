@@ -1,6 +1,8 @@
 # Brazilian E-Commerce Analysis (Olist Dataset) | 2016–2018
 > Analyzing **100K+ orders** across sales overview, time, products, payments, customer satisfaction, and delivery performance to uncover what drives revenue, loyalty, and operational efficiency on Brazil's leading e-commerce platform.
 
+**Source:** [Olist Brazilian E-Commerce Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — Kaggle
+
 ## Executive Summary
 
 Olist, Brazil's largest e-commerce marketplace, grew revenue **20× in two years**.
@@ -25,8 +27,18 @@ This one doesn't.
 > **The single metric that predicts everything else: Monthly Late Delivery Rate.**
 > Keep it below 7%. Above 10%, trigger a logistics audit immediately.
 
-**[View the full no-code report →](file:///Users/napi/Analysis-portfolio/olist-ecommerce-analysis/olist-ecommerce-analysis/reports/olist_report.html)**
-*(Charts and insights only — no code visible)*
+---
+
+## Analysis Sections
+
+| Section | Business Question | Method |
+|---|---|---|
+| **I. Sales Overview** | Is revenue elite-driven or volume-driven? | Pareto curve, AOV distribution |
+| **II. Time Analysis** | Is growth sustainable or concentrated in volatile months? | Monthly revenue trend, seasonality bar chart |
+| **III. Product Analysis** | Which categories deserve investment? | Revenue vs volume dual ranking |
+| **IV. Payment Analysis** | Does payment infrastructure serve all segments? | Payment type distribution, installment frequency |
+| **V. Customer Satisfaction** | What operational variable predicts a 1-star review? | Delivery bucket heatmap, violin plot by score |
+| **VI. Delivery Performance** | Is reliability improving over time? | Monthly late delivery rate trend line |
 
 ---
 
@@ -55,17 +67,14 @@ olist-ecommerce-analysis/
 │
 ├── data/
 │   ├── raw/                        # Original 9 CSVs (git-ignored)
-│   └── processed/                  # Parquet cache files (git-ignored)
+│   └── processed/                  # Parquet cache files
 │
 ├── notebooks/
-│   └── olist_analysis.ipynb        # Main analysis — narrative + visualizations
-│
-├── reports/
-│   └── olist_report.html           # No-code HTML export for non-technical viewers
+│   └── olist_analysis.ipynb        # Main analysis — narrative and visualizations
 │
 ├── src/
 │   ├── __init__.py
-│   ├── data_processing.py          # Core module: load, clean, feature engineer
+│   ├── data_processing.py          # Core module: load, clean, feature engineering
 │   └── visualizations.py          # Reusable plotting functions
 │
 └── tests/
@@ -127,22 +136,7 @@ to enable caching. The cache is git-ignored and lives locally only.
 
 ---
 
-## Analysis Sections
-
-| Section | Business Question | Method |
-|---|---|---|
-| **I. Sales Overview** | Is revenue elite-driven or volume-driven? | Pareto curve, AOV distribution |
-| **II. Time Analysis** | Is growth sustainable or concentrated in volatile months? | Monthly revenue trend, seasonality bar chart |
-| **III. Product Analysis** | Which categories deserve investment? | Revenue vs volume dual ranking |
-| **IV. Payment Analysis** | Does payment infrastructure serve all segments? | Payment type distribution, installment frequency |
-| **V. Customer Satisfaction** | What operational variable predicts a 1-star review? | Delivery bucket heatmap, violin plot by score |
-| **VI. Delivery Performance** | Is reliability improving over time? | Monthly late delivery rate trend line |
-
----
-
 ## Data
-
-**Source:** [Olist Brazilian E-Commerce Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — Kaggle
 
 **Period:** September 2016 – August 2018
 
