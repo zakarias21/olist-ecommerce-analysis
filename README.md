@@ -8,6 +8,12 @@ Analyzing 100K+ e-commerce orders across sales, products, payments, customer sat
 
 # Executive Summary
 
+### Interactive Dashboard
+
+[![Power BI](https://img.shields.io/badge/Power%20BI-Live%20Dashboard-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)](https://app.powerbi.com/view?r=eyJrIjoiZjRkODk2MjAtNTFkOS00YjlkLWExZjItYmM2YWNmNjI1MDY4IiwidCI6IjM4YzkwM2Q1LWIwNmMtNGRlMi04MDI3LTI0MzMxZDY5NjBhNSJ9)
+
+[▶️ View Live Interactive Dashboard →](https://app.powerbi.com/view?r=eyJrIjoiZjRkODk2MjAtNTFkOS00YjlkLWExZjItYmM2YWNmNjI1MDY4IiwidCI6IjM4YzkwM2Q1LWIwNmMtNGRlMi04MDI3LTI0MzMxZDY5NjBhNSJ9)
+
 Olist grew revenue nearly 20× between 2016 and 2018. This analysis focuses on three business questions that directly impact commercial and operational performance.
 
 ## 1. Where Is Growth Coming From?
