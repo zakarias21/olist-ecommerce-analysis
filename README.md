@@ -2,7 +2,7 @@
 
 Analyzing 100K+ e-commerce orders across sales, products, payments, customer satisfaction, and delivery performance to identify the key drivers of growth, loyalty, and operational efficiency on Brazil's largest online marketplace.
 
-**Dataset:** Olist Brazilian E-Commerce Dataset (Kaggle)
+**Dataset:** [Olist Brazilian E-Commerce Dataset (Kaggle)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 
 ---
 
@@ -238,7 +238,4 @@ could increase Average Order Value without increasing listed prices.
 
 **Zakarias Musa**
 
-Environmental Engineering Graduate | Data Analytics & Business Intelligence Enthusiast
-
-- LinkedIn: [Add Link]
-- GitHub: [Add Link]
+Data Analyst & BI Developer
