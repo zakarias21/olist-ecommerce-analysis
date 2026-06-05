@@ -1,192 +1,244 @@
 # Brazilian E-Commerce Analysis (Olist Dataset) | 2016–2018
-> Analyzing **100K+ orders** across sales overview, time, products, payments, customer satisfaction, and delivery performance to uncover what drives revenue, loyalty, and operational efficiency on Brazil's leading e-commerce platform.
 
-**Source:** [Olist Brazilian E-Commerce Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — Kaggle
+Analyzing 100K+ e-commerce orders across sales, products, payments, customer satisfaction, and delivery performance to identify the key drivers of growth, loyalty, and operational efficiency on Brazil's largest online marketplace.
 
-## Executive Summary
-
-Olist, Brazil's largest e-commerce marketplace, grew revenue **20× in two years**.
-This analysis answers three questions every ops or commercial leader cares about:
-
-**1. Where is the money coming from?**
-Growth was entirely volume-driven — the platform acquired more customers, not bigger
-spenders. Average order value held flat at ~BRL 160 all year. The business scaled
-because the funnel widened, not because prices went up.
-
-**2. What is the single biggest risk to that growth?**
-Late deliveries. Customers who waited 21+ days gave 1-star reviews at 3× the rate
-of customers who waited 10 days. One bad month of logistics erases months of
-satisfaction gains. This was proven in 2018 Q1, when the late rate hit 19% —
-and review scores dropped immediately.
-
-**3. Where should the business invest next?**
-`health_beauty` is the only category ranking top-2 in both revenue and units sold.
-Every other top category requires a trade-off between revenue per unit and volume.
-This one doesn't.
-
-> **The single metric that predicts everything else: Monthly Late Delivery Rate.**
-> Keep it below 7%. Above 10%, trigger a logistics audit immediately.
+**Dataset:** Olist Brazilian E-Commerce Dataset (Kaggle)
 
 ---
 
-## Analysis Sections
+# Executive Summary
+
+Olist grew revenue nearly 20× between 2016 and 2018. This analysis focuses on three business questions that directly impact commercial and operational performance.
+
+## 1. Where Is Growth Coming From?
+
+Growth was driven almost entirely by increasing order volume rather than higher customer spending.
+
+- Revenue increased nearly 20× over the study period.
+- Average Order Value (AOV) remained stable at approximately BRL 160 throughout the year.
+- The platform scaled by acquiring more customers and processing more orders rather than increasing basket size.
+
+## 2. What Is the Biggest Risk to Continued Growth?
+
+Delivery performance emerged as the strongest operational driver of customer satisfaction.
+
+- Customers who gave 1-star reviews waited an average of 20.85 days.
+- Customers who gave 5-star reviews waited only 10.22 days.
+- During Q1 2018, the late-delivery rate reached 19%, triggering an immediate decline in customer satisfaction.
+
+## 3. Where Should the Business Invest?
+
+Among all product categories, **health_beauty** demonstrated the strongest balance of scale and profitability.
+
+- #1 category by revenue (BRL 1.26M)
+- #2 category by units sold (9,670)
+
+Unlike other leading categories, it did not require a trade-off between revenue and sales volume.
+
+### Most Important KPI
+
+**Monthly Late Delivery Rate**
+
+Recommended thresholds:
+
+- Below 7% → Healthy
+- 7–10% → Elevated Risk
+- Above 10% → Immediate Logistics Review
+
+---
+
+# Tech Stack
+
+| Tool | Purpose |
+|--------|--------|
+| Python 3.11 | Data Analysis |
+| Pandas | Data Cleaning & Transformation |
+| Matplotlib | Visualization |
+| Seaborn | Statistical Visualization |
+| PyArrow | Parquet Caching |
+| Jupyter Notebook | Analysis Environment |
+| Git & GitHub | Version Control |
+
+---
+
+# Dataset Overview
+
+## Analysis Period
+
+September 2016 – August 2018
+
+## Tables Used
+
+| Table | Raw Rows | After Cleaning |
+|---------|---------:|---------:|
+| Orders | 99,441 | 99,441 |
+| Order Items | 112,650 | 112,650 |
+| Payments | 103,886 | 103,886 |
+| Reviews | 99,224 | 99,224 |
+| Products | 32,951 | 32,949 |
+| Customers | 99,441 | 99,441 |
+| Sellers | 3,095 | 3,095 |
+| Geolocation | 1,000,163 | 19,015 (aggregated) |
+| Category Translation | 71 | 71 |
+
+---
+
+# Analysis Sections
 
 | Section | Business Question | Method |
-|---|---|---|
-| **I. Sales Overview** | Is revenue elite-driven or volume-driven? | Pareto curve, AOV distribution |
-| **II. Time Analysis** | Is growth sustainable or concentrated in volatile months? | Monthly revenue trend, seasonality bar chart |
-| **III. Product Analysis** | Which categories deserve investment? | Revenue vs volume dual ranking |
-| **IV. Payment Analysis** | Does payment infrastructure serve all segments? | Payment type distribution, installment frequency |
-| **V. Customer Satisfaction** | What operational variable predicts a 1-star review? | Delivery bucket heatmap, violin plot by score |
-| **VI. Delivery Performance** | Is reliability improving over time? | Monthly late delivery rate trend line |
+|----------|------------------|----------|
+| Sales Overview | Is growth volume-driven or value-driven? | Pareto analysis, AOV distribution |
+| Time Analysis | Is growth sustainable over time? | Revenue trends and seasonality |
+| Product Analysis | Which categories deserve investment? | Revenue and volume rankings |
+| Payment Analysis | How do customers prefer to pay? | Payment type and installment analysis |
+| Customer Satisfaction | What predicts poor reviews? | Delivery-time segmentation |
+| Delivery Performance | Is reliability improving? | Monthly late-delivery trends |
 
 ---
 
-## Key Findings at a Glance
+# Key Findings
 
-| Finding | What It Means |
-|---|---|
-| **BRL 15.4M revenue, 96K orders** | Realized revenue from delivered orders only — cancelled orders excluded |
-| **AOV stable at BRL 160 year-round** | Customers don't spend more in peak months — volume is the only growth lever |
-| **92% of orders arrive early** | Deliberate strategy: Olist sets estimates 12 days beyond actual delivery time |
-| **Score-1 customers waited 2× longer** | 20.85 days avg for 1-star vs 10.22 days for 5-star — delivery time is the predictor |
-| **2018 Q1: late rate hit 19%** | The only structural failure in 2 years — satisfaction damage lasted 3+ months |
-| **health_beauty leads both dimensions** | #1 in revenue (BRL 1.26M) AND #2 in volume (9,670 units) — uniquely balanced |
-| **Credit card = 77% of transactions** | Boleto (bank slip) holds a structurally significant 20% — not a marginal segment |
+| Finding | Business Meaning |
+|----------|----------------|
+| BRL 15.4M revenue from 96K delivered orders | Revenue calculations exclude cancelled orders |
+| Average Order Value remained near BRL 160 | Growth came from volume, not larger purchases |
+| 92% of orders arrived early | Delivery estimates were intentionally conservative |
+| 1-star customers waited twice as long as 5-star customers | Delivery speed strongly influences satisfaction |
+| Late-delivery rate peaked at 19% in Q1 2018 | Largest operational disruption in the dataset |
+| health_beauty ranked top in both revenue and volume | Strong candidate for inventory and marketing investment |
+| Credit cards represented 77% of transactions | Dominant payment method |
+| Boleto accounted for approximately 20% of orders | Critical payment option for customer accessibility |
 
 ---
 
-## Project Structure
+# Repository Structure
 
-```
+```text
 olist-ecommerce-analysis/
-│
-├── README.md                       # You are here
-├── requirements.txt                # Pinned dependencies
-├── .gitignore                      # Excludes data/ and cache files
+
+├── README.md
+├── requirements.txt
+├── .gitignore
 │
 ├── data/
-│   ├── raw/                        # Original 9 CSVs (git-ignored)
-│   └── processed/                  # Parquet cache files
+│   ├── raw/
+│   └── processed/
 │
 ├── notebooks/
-│   └── olist_analysis.ipynb        # Main analysis — narrative and visualizations
+│   └── olist_analysis.ipynb
 │
 ├── src/
 │   ├── __init__.py
-│   ├── data_processing.py          # Core module: load, clean, feature engineering
-│   └── visualizations.py          # Reusable plotting functions
+│   ├── data_processing.py
+│   └── visualizations.py
 │
 └── tests/
-    └── test_data_processing.py     # Sanity checks on core functions
+    └── test_data_processing.py
 ```
----
-
-## Module Design
-*This section is for technical viewers.*
-
-All data loading, cleaning, and feature engineering is isolated in `src/data_processing.py`.
-The notebook imports clean, analysis-ready DataFrames — no raw transformation logic
-in the narrative layer.
-
-### `load_and_clean_all(base_path) → dict[str, pd.DataFrame]`
-
-Loads all 9 Olist CSV files and applies every cleaning step in a single call.
-
-What it does per table:
-
-| Table | Nulls | Duplicates | Type Fixes | Notes |
-|---|---|---|---|---|
-| customers | None found | Defensive drop | zip prefix → object | Zip is categorical, not numeric |
-| orders | Date cols → NaT intentional | Defensive drop | 5 cols → datetime | NaT = undelivered, filtered downstream |
-| order_items | None found | Defensive drop | shipping_limit_date → datetime, item_id → object | |
-| payments | None found | Defensive drop | — | |
-| reviews | Comment cols dropped (high null, unused) | Defensive drop | 2 cols → datetime | Null scores dropped |
-| products | category fillna('unknown'), count cols fillna(0) | Defensive drop | count cols → int | 2 rows dropped (missing dimensions) |
-| sellers | None found | Defensive drop | city → lowercase | |
-| geolocation | None found | Handled in aggregate_geolocation() | — | Dedup deferred — 1M rows processed once |
-| category_translation | None found | Defensive drop | name cols → lowercase/strip | |
-
-### `build_delivery_metrics(orders) → pd.DataFrame`
-
-Adds five columns to the orders DataFrame in one call. Consolidates logic that was
-previously scattered across 5 separate notebook cells.
-
-```
-delivery_days           actual days from purchase → delivered to customer
-estimated_delivery_days days from purchase → promised delivery date
-delay_days              actual minus estimated (negative = early, positive = late)
-delivery_status         'Early' / 'On-Time' / 'Late' label
-purchase_month          Period column (YYYY-MM) for monthly trend analysis
-```
-
-### `aggregate_geolocation(geo, cache_path=None) → pd.DataFrame`
-
-Deduplicates the 1M+ row geolocation table and aggregates to zip-prefix level.
-
-Performance profile:
-
-```
-First run  : ~2s  (deduplicates 261,831 rows → groups 738,332 → 19,015 zip prefixes)
-Cached runs: ~0.1s (reads data/processed/geo_agg.parquet directly)
-```
-
-The `cache_path` parameter is optional. Pass `'data/processed/geo_agg.parquet'`
-to enable caching. The cache is git-ignored and lives locally only.
 
 ---
 
-## Data
+# Data Processing Pipeline
 
-**Period:** September 2016 – August 2018
+The project separates data preparation from analysis to improve maintainability and reproducibility.
 
-| Table | Raw Rows | After Cleaning |
-|---|---|---|
-| olist_orders | 99,441 | 99,441 |
-| olist_order_items | 112,650 | 112,650 |
-| olist_order_payments | 103,886 | 103,886 |
-| olist_order_reviews | 99,224 | 99,224 |
-| olist_products | 32,951 | 32,949 |
-| olist_customers | 99,441 | 99,441 |
-| olist_sellers | 3,095 | 3,095 |
-| olist_geolocation | 1,000,163 | 19,015 *(aggregated to zip prefix)* |
-| product_category_translation | 71 | 71 |
+## load_and_clean_all()
 
----
+Loads and cleans all Olist tables through a single function.
 
-## Operational Recommendations
+Processing includes:
 
-**1. Monitor the monthly late delivery rate as a leading indicator**
-Below 7% → normal. 7–10% → elevated risk, investigate. Above 10% → immediate
-logistics audit. The 2018 Q1 data shows two consecutive months above threshold
-produce satisfaction damage that takes 3+ months to reverse.
+- Missing-value handling
+- Duplicate removal
+- Datetime conversion
+- Category standardization
+- Feature preparation
 
-**2. Prioritize health_beauty for inventory and seller investment**
-It is the only category that does not require a trade-off between revenue per unit
-and total units sold. All other top categories optimize for one at the expense of the other.
+## build_delivery_metrics()
 
-**3. Retain boleto as a first-class payment option**
-20% of transactions (19,783 orders) use boleto — Brazil-specific bank-slip payment
-for unbanked customers. Deprioritizing it would structurally exclude 1 in 5 customers.
+Creates delivery-related analytical features:
 
-**4. Promote 8 and 10-installment credit card plans for high-value categories**
-The spike in 8 and 10-installment usage is not organic behavior — it reflects
-structured plan offerings. Extending these to watches_gifts and computers_accessories
-could lift AOV without requiring price increases.
+- delivery_days
+- estimated_delivery_days
+- delay_days
+- delivery_status
+- purchase_month
+
+## aggregate_geolocation()
+
+Aggregates more than one million geolocation records to ZIP-prefix level and supports local Parquet caching.
+
+Performance:
+
+- First execution: ~2 seconds
+- Cached execution: ~0.1 seconds
 
 ---
 
-## Tech Stack
+# Business Recommendations
 
-| Tool | Purpose |
-|---|---|
-| Python 3.11 | Core language |
-| pandas 2.1 | Data manipulation |
-| matplotlib / seaborn | Visualization |
-| pyarrow | Parquet caching for geolocation |
-| JupyterLab | Notebook environment |
-| Git | Version control |
+## 1. Monitor Late Delivery Rate as a Core KPI
+
+Delivery performance is the strongest leading indicator of customer satisfaction.
+
+Recommended thresholds:
+
+- Below 7% → Normal
+- 7–10% → Investigate
+- Above 10% → Immediate logistics audit
+
+The Q1 2018 disruption demonstrates how quickly customer experience deteriorates when delays increase.
+
+## 2. Prioritize Health & Beauty Category Growth
+
+health_beauty was the only major category performing strongly in both revenue generation and sales volume.
+
+Potential actions:
+
+- Increase inventory availability
+- Expand seller recruitment
+- Allocate additional marketing budget
+
+## 3. Preserve Boleto as a Strategic Payment Option
+
+Nearly 20% of orders used boleto payments.
+
+Removing or deprioritizing this payment channel would risk excluding a significant customer segment.
+
+## 4. Expand Installment-Based Purchasing
+
+Installment plans showed strong adoption for higher-value purchases.
+
+Extending installment offerings to categories such as:
+
+- watches_gifts
+- computers_accessories
+
+could increase Average Order Value without increasing listed prices.
 
 ---
 
-*Analysis by [zakarias musa] | [LinkedIn](www.linkedin.com/in/zakariasmusa2193) | [GitHub](https://github.com/zakarias-21)*
+# Skills Demonstrated
+
+- Data Cleaning
+- Exploratory Data Analysis (EDA)
+- Feature Engineering
+- Customer Analytics
+- Product Analytics
+- Logistics & Operations Analysis
+- Business Intelligence
+- Data Visualization
+- Performance Optimization
+- Repository Organization
+- Analytical Storytelling
+
+---
+
+# Author
+
+**Zakarias Musa**
+
+Environmental Engineering Graduate | Data Analytics & Business Intelligence Enthusiast
+
+- LinkedIn: [Add Link]
+- GitHub: [Add Link]
