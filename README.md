@@ -127,9 +127,9 @@ olist-ecommerce-analysis/
 ├── .gitignore
 │
 ├── data/
-│   ├── raw/
 │   └── processed/
-│
+├── Reports/
+│   └── Interactive Dashboard/
 ├── notebooks/
 │   └── olist_analysis.ipynb
 │
