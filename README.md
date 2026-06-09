@@ -224,22 +224,6 @@ could increase Average Order Value without increasing listed prices.
 
 ---
 
-# Skills Demonstrated
-
-- Data Cleaning
-- Exploratory Data Analysis (EDA)
-- Feature Engineering
-- Customer Analytics
-- Product Analytics
-- Logistics & Operations Analysis
-- Business Intelligence
-- Data Visualization
-- Performance Optimization
-- Repository Organization
-- Analytical Storytelling
-
----
-
 # Author
 
 **Zakarias Musa**
